@@ -5,39 +5,35 @@
 [![2.1.0 demo](https://img.youtube.com/vi/7yI_9NfhpwI/1.jpg)](https://youtu.be/7yI_9NfhpwI)
 
 ### New Update
-#### [2.1.1] - 2018.11.23
-- TTS feature is added. Now, Other modules can order MMM-AssistantMk2 to say something. It can be used like something similar TEXT-TO-SPEECH. By example, you can build your customClock module to say current time via MMM-AssistantMk2
-  - USAGE:
-    - `this.sendNotification("ASSISTANT_SAY", "Time to go to bed")`
-    - `this.sendNotification("ASSISTANT_SAY", {text:"C'est trop chaud", lang:"fr-FR"})`
-  - NOTICE:
-    - This feature is somekind of Assistant hooking. If you say "Repeat after me SOMETHING", Google Assistant will repeat SOMETHING. So, there could be a possibility of not responding as intend. Too long or complex text might be not available.
-    - Currently I can't find correspondence of `Repeat after me` for **German/Japanese/Korean** language. PR please.
-  - Thanks to [Valerio Pilo](https://github.com/vpilo). His brilliant idea and PR could make this feature.
-- For TelegramBot, TTS feature is also added. Now you can make your Home Mirror to say something with MMM-TelegramBot even when you are working in your office.
-  - `/s Please open the door, mom!`
-- Youtube playing status in frontend dev console added.
-  - At least you can get status of Youtube player event when video fails to be played.
+#### [2.1.4] - 2019.03.26
+- Added : Now you can use `recipes`. https://github.com/eouia/MMM-AssistantMk2/wiki/Usage#recipes
+    
+  `recipe` is an external js file containing definitions of `command`, `transcriptionHook` and `action`. Your configuration could be more shorter.
+  
+  Feel free to request PR to share your recipes to others.
+- Changed : `onIdle`, `onDetected` features are disabled by default.
+
 - For update from 2.1.0
 ```
 cd ~/MagicMirror/modules/MMM-AssistantMk2
 git pull
 ```
+
 ### Install & Update
-Read [INSTALL.md](/INSTALL.md)
+Read [WIKI:Installation](https://github.com/eouia/MMM-AssistantMk2/wiki/Installation)
 
 ### Configuration
-Read [CONFIGURATION.md](/CONFIGURATION.md)
+Read [WIKI:Configuration](https://github.com/eouia/MMM-AssistantMk2/wiki/Configuration)
 
 ### Usage
-Read [USAGE.md](/USAGE.md)
+Read [WIKI:Usage](https://github.com/eouia/MMM-AssistantMk2/wiki/Usage)
 
 
 #### Incoming Notifications as ASSISTANT request.
 |Notification|Payload|Description|
 |---|---|---|
 |ASSISTANT_ACTIVATE|{profile:`String`}|Assistant will start with this profile name.
-|ASSISTANT_CLEAR|null|Current playing video or content will be disappeared. And Assistant turns to sleep mode for waiting invocation.
+|ASSISTANT_CLEAR|null|Current playing video or content will disappear. And Assistant will turn to sleep mode for waiting invocation.
 |ASSISTANT_QUERY| `String` | Ask to Assistant about `String`,
 |ASSISTANT_SAY| `String` or `{text:String, lang:"en-US"}` | Assistant will say this `String`
 
@@ -46,7 +42,7 @@ Read [USAGE.md](/USAGE.md)
 |---|---|---|
 |ASSISTANT_ACTIVATED|null|Assistant is started now.
 |ASSISTANT_DEACTIVATED|null|Assistant is stopped now.
-|ASSISTANT_HOOK|{hook:"`HOOKED_STRING`"}|Your defined hooking phrase is caught in your speech.
+|ASSISTANT_HOOK|{hook:"`HOOKED_STRING`"}|Your defined hooking phrase caught from your speech.
 |ASSISTANT_ACTION|`FOUND_ACTION_OBJECT`|When the response is defined or customized action of Assistant.
 
 
@@ -103,58 +99,6 @@ npm install grpc@1.13
 npm install --save-dev electron-rebuild
 ./node_modules/.bin/electron-rebuild
 ```
-
-
-### Old Updates
-#### [2.1.0] - 2018.11.14
-- Customizable `command` feature is added. Now you can control your device and MM without other module's help.
-  And notification system of `transcriptionHook` is changed. New configuration is needed.
-- Prepared hook commands. Say these (Or customize them in configuration)
-  - `hide all` : modules on screen will be hidden
-  - `show all` : hidden modules will be shown again
-  - `reboot yourself` : reboot device
-  - `shutdown yourself` : shutdown device
-  - `go to sleep` : LCD power off (you might need to modify `/scripts/screenoff.sh`)
-  - `wake up` : LCD power on (you might need to modify `/scripts/screenon.sh`)
-- `onIdle` feature be added. After `timer` without no query after last query, `command` will be activated. (By default, after 30min All modules will be hidden.)
-- And `onActivate` feature is added. When you activate Assistant, this `command` will be executed after `timer`. (By default, modules hidden by `onIdle` will be shown again)
-- For update from 2.0.0
-```
-cd ~/MagicMirror/modules/MMM-AssistantMk2
-git pull
-cd scripts
-chmod +x *.sh
-```
-#### [2.0.0] - 2018.11.05
-- Whole new build-up.
-- Annoying `speaker` dependencies deprecated
-- More stable. (I think)
-- Choppy sound issue solved(I think), If you get still this issue, that might be the lack of computing power of your device.
-- NotificationTrigger dependency free. Now you can activate without NotificationTrigger (But If you want, you can still use it.)
-- Making Hook and GAction becomes easier
-- `MMM-TelegramBot` supproted
-
-
-#### [1.1.1] - 2018.10.22
-- Speaker device configurable(`audio.speakerDevice`) (It might be able to fix some bugs about playing `ding.wav`)
-
-
-#### [1.1.0] - 2018.10.04
-- MP3 Output is supported. Now you can get more unchunky sound result.(Set `audio.encodingOut` to `MP3` // `OGG` is not yet supported.)
-- `ding.wav` will be played when Assistant is ready to hear your voice.
-- For update from prior version
-```
-sudo apt-get install mpg321
-cd ~/MagicMirror/modules/MMM-AssistantMk2
-git pull
-npm install --save wav
-```
-
-#### [1.0.1] - 2018.07.25.
-- Youtube playlist can be playable
-- Some uncaught youtube videos are caught now
-- On youtube player error, error code is shown
-- notifyPlaying option is added.
 
 
 ### TODO

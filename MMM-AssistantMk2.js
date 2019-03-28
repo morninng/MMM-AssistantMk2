@@ -4,7 +4,7 @@
 var ytp
 Module.register("MMM-AssistantMk2", {
   defaults: {
-    verbose:false,
+    verbose: true,
     projectId: "", // Google Assistant ProjectId (Required only when you use gAction.)
     useGactionCLI: false,
     startChime: "connection.mp3",
@@ -31,146 +31,32 @@ Module.register("MMM-AssistantMk2", {
         // https://developers.google.com/assistant/sdk/reference/rpc/languages
       },
     },
-
-    transcriptionHook: {
-      "HIDE_ALL_MODULES": {
-        pattern: "hide all",
-        command: "HIDEMODULES"
-      },
-      "SHOW_ALL_MODULES": {
-        pattern: "show all",
-        command: "SHOWMODULES"
-      },
-      "SCREEN_ON": {
-        pattern: "wake up",
-        command: "SCREENON"
-      },
-      "SCREEN_OFF": {
-        pattern: "go to sleep",
-        command: "SCREENOFF"
-      },
-      "REBOOT": {
-        pattern: "reboot yourself",
-        command: "REBOOT"
-      },
-      "SHUTDOWN": {
-        pattern: "shutdown yourself",
-        command: "SHUTDOWN"
-      }
-    },
-    action: {
-      /*
-      "com.example.commands.REBOOT" : {
-        notification: "SHOW_ALERT",
-        payload: {
-          message: "You've ordered REBOOT",
-          timer: 3000,
-        }
-      },
-      "com.example.commands.PAGE" : {
-        notification: (params) => {
-          if (params.number) {
-            return "PAGE_CHANGED"
-          } else if (params.incordec == "INC") {
-            return "PAGE_INCREMENT"
-          } else {
-            return "PAGE_DECREMENT"
-          }
-        },
-        payload: (params) => {
-          if (params.number) {
-            return params.number
-          } else {
-            return null
-          }
-        }
-      }
-      */
-    },
-
-    command: {
-      "HIDEMODULES": {
-        moduleExec: {
-          module:()=>{
-            return []
-          },
-          exec: (module, params, key) => {
-            module.hide(1000, null, {lockString:"AMK2"})
-          }
-        }
-      },
-      "SHOWMODULES": {
-        moduleExec: {
-          module:[],
-          exec: (module, params, key) => {
-            module.show(1000, null, {lockString:"AMK2"})
-          }
-        }
-      },
-      "SCREENON": {
-        shellExec: {
-          exec: (params, key) => {
-            return "~/MagicMirror/modules/MMM-AssistantMk2/scripts/screenon.sh"
-            //return "ls -al"
-          },
-          options: (params, key)=> {
-            return ""
-          },
-        }
-      },
-      "SCREENOFF": {
-        shellExec: {
-          exec: "~/MagicMirror/modules/MMM-AssistantMk2/scripts/screenoff.sh",
-          options: null,
-        }
-      },
-      "REBOOT": {
-        /*
-        notificationExec: {
-          notification: "SHOW_ALERT",
-          payload: {
-            message: "You've ordered REBOOT. I'm showing just alert, but you can modify config.js to reboot really.",
-            timer: 5000,
-          }
-        },
-        */
-
-        shellExec: {
-          exec: "sudo reboot now"
-        }
-
-      },
-      "SHUTDOWN": {
-        /*
-        notificationExec: {
-          notification: (params, key) => {
-            return "SHOW_ALERT"
-          },
-          payload: (params, key)=> {
-            return {
-              message: "You've ordered SHUTDOWN. I'm showing just alert, but you can modify config.js to reboot really.",
-              timer: 5000,
-            }
-          }
-        },
-        */
-
-        shellExec: {
-          exec: "sudo shutdown now"
-        }
-
-      },
-    },
+    recipes:["hide_and_show_all_modules.js", "reboot.js", "screen_onoff.js", "shutdown.js"],
+    transcriptionHook: {},
+    action: {},
+    command: {},
     responseVoice: true, // If available, Assistant will response with her voice.
     responseScreen: true, // If available, Assistant will response with some rendered HTML
     responseAlert: true, // If available, Assistant will response with Alert module of MM
     // Sometimes, any response could not be returned.
+    ignoreNoVoiceError: true, //To avoid some annoying youtube stop bug.
+
+
 
     screenZoom: "80%",
     screenDuration: 0, //If you set 0, Screen Output will be closed after Response speech finishes.
 
     youtubeAutoplay: true,
+    spotifyAutoplay: true,
     pauseOnYoutube:true,
+    youtubePlayerVars: { // You can set youtube playerVars for your purpose, but should be careful.
+      "controls": 0,
+      "loop": 1,
+      "rel": 0,
+    },
+    youtubePlayQuality: "default", //small, medium, large, hd720, hd1080, highres or default
+
+
     alertError: true,
 
     useWelcomeMessage: "",
@@ -195,13 +81,16 @@ Module.register("MMM-AssistantMk2", {
     },
 
     onIdle: {
-      timer: 1000*60*30, // if you don't want to use this feature, just set timer as `0` or command as ""
-      command: "HIDEMODULES"
+      //timer: 1000*60*30, // if you don't want to use this feature, just set timer as `0` or command as ""
+      //command: "HIDEMODULES",
+      timer: 0,
+      command: null,
     },
 
     onActivate: {
       timer: 0,
-      command: "SHOWMODULES"
+      //command: "SHOWMODULES"
+      command: null,
     },
 
     notifications: {
@@ -210,6 +99,8 @@ Module.register("MMM-AssistantMk2", {
       ASSISTANT_ACTIVATED: "ASSISTANT_ACTIVATED",
       ASSISTANT_DEACTIVATED: "ASSISTANT_DEACTIVATED",
       ASSISTANT_ACTION: "ASSISTANT_ACTION",
+      ASSISTANT_UNDERSTOOD: "ASSISTANT_UNDERSTOOD",
+      ASSISTANT_RESPONSE_END: "ASSISTANT_RESPONSE_END",
       DEFAULT_HOOK_NOTIFICATION: "ASSISTANT_HOOK",
       TEXT_QUERY: "ASSISTANT_QUERY",
       SAY_TEXT: "ASSISTANT_SAY"
@@ -219,7 +110,7 @@ Module.register("MMM-AssistantMk2", {
   },
 
   magicQueryToSay: {
-    "de" : "Repeat after me : '%TEXT%'", // I cannot find proper query for Deutsch
+    "de" : "Sprich mir nach : '%TEXT%'",
     "en" : "Repeat after me : '%TEXT%'",
     "fr" : "Répétez après moi : '%TEXT%'",
     "it" : "Ripeti dopo di me : '%TEXT%'",
@@ -231,6 +122,10 @@ Module.register("MMM-AssistantMk2", {
 
   getStyles: function () {
     return ["MMM-AssistantMk2.css"]
+  },
+
+  getScripts: function() {
+    return ["modules/MMM-AssistantMk2/vendor/serialize.js"]
   },
 
   getCommands: function () {
@@ -254,7 +149,6 @@ Module.register("MMM-AssistantMk2", {
       this.notificationReceived(this.config.notifications.TEXT_QUERY, handler.args, "MMM-TelegramBot")
     }
     if (command == "s" && handler.args) {
-      console.log("s", handler.args)
       handler.reply("TEXT", "AssistantMk2 will repeat your text: " + handler.args)
       this.notificationReceived(this.config.notifications.SAY_TEXT, handler.args, "MMM-TelegramBot")
     }
@@ -277,8 +171,6 @@ Module.register("MMM-AssistantMk2", {
   getDom : function() {
     return this.assistant.drawDom()
   },
-
-
 
   notificationReceived: function (notification, payload, sender) {
     switch(notification) {
@@ -329,6 +221,18 @@ Module.register("MMM-AssistantMk2", {
 
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
+      case "LOAD_RECIPE":
+        var p = serialize.unserialize(payload)
+        if (p.transcriptionHook) {
+          this.config.transcriptionHook = Object.assign({}, this.config.transcriptionHook, p.transcriptionHook)
+        }
+        if (p.action) {
+          this.config.action = Object.assign({}, this.config.action, p.action)
+        }
+        if (p.command) {
+          this.config.command = Object.assign({}, this.config.command, p.command)
+        }
+        break
       case "INITIALIZED":
         if (this.config.useWelcomeMessage) {
           this.assistant.activate(this.config.profiles[this.config.defaultProfile], this.config.useWelcomeMessage)
@@ -356,6 +260,7 @@ Module.register("MMM-AssistantMk2", {
         this.assistant.responseStart(payload)
         break
       case "RESPONSE_END":
+        this.sendNotification(this.config.notifications.ASSISTANT_RESPONSE_END)
         break
       case "CONVERSATION_END":
         this.assistant.conversationEnd(payload)
@@ -528,6 +433,10 @@ class AssistantHelper {
     if (key == "STANDBY") {
       this.subdom.mic.className = ""
     }
+
+    if (key == "UNDERSTANDING") {
+      this.sendNotification(this.config.notifications.ASSISTANT_UNDERSTOOD)
+    }
   }
 
   getStatus() {
@@ -572,14 +481,14 @@ class AssistantHelper {
       this.sendSocketNotification("START", {profile:profile, textQuery:textQuery, sender:sender, id:id, sayMode:sayMode})
       if (this.config.onActivate) {
         setTimeout(()=>{
-          this.doCommand(this.config.onActivate, "onActivate")
+          this.doCommand(this.config.onActivate, "onActivate", "onActivate")
         }, this.config.onActivate.timer)
       }
 
       if (this.config.onIdle && this.config.onIdle.timer > 0) {
         clearTimeout(this.idleTimer)
         this.idleTimer = setTimeout(()=>{
-          this.doCommand(this.config.onIdle, "onIdle")
+          this.doCommand(this.config.onIdle, "onIdle", "onIdle")
         }, this.config.onIdle.timer)
       }
       return true
@@ -599,9 +508,9 @@ class AssistantHelper {
 
   clearResponse() {
     this.subdom.message.innerHTML = ""
-    this.subdom.youtube.innerHTML = ""
-    this.subdom.youtube.style.display = "none"
-    this.youtubePlaying = false
+    this.subdom.youtube.innerHTML = ""  // comment this line to not stop youtube when calling assistant
+    this.subdom.youtube.style.display = "none"  // comment this line to not stop youtube when calling assistant
+    this.youtubePlaying = false  // comment this line to not stop youtube when calling assistant
     //this.sendSocketNotification(this.config.notifications.ASSISTANT_DEACTIVATED)
   }
 
@@ -674,7 +583,7 @@ class AssistantHelper {
     }
   }
 
-  doCommand (hooked, key) {
+  doCommand (hooked, param, key) {
     var hook
     if (this.config.command.hasOwnProperty(hooked.command)) {
       hook = this.config.command[hooked.command]
@@ -684,19 +593,26 @@ class AssistantHelper {
     if (hook.hasOwnProperty("notificationExec")) {
       var ne = hook.notificationExec
       var notification = (ne.notification) ? ne.notification : this.config.notifications.DEFAULT_HOOK_NOTIFICATION
-      var fn = (typeof notification == "function") ? notification(hook.payload, key) : notification
+      //var fn = (typeof notification == "function") ? notification(hook.payload, key) : notification
+      var fn = (typeof notification == "function") ? notification(param, key) : notification
       var payload = (ne.payload) ? ne.payload : hook.payload
-
-      var fp = (typeof payload == "function") ? payload(hook.payload, key) : Object.assign({}, payload)
-        this.sendNotification(fn, fp)
+      var fp
+      if (typeof payload == "function") {
+        fp = payload(param, key)
+      } else if (typeof payload == "object") {
+        fp = Object.assign({}, payload)
+      } else {
+        fp = payload
+      }
+      this.sendNotification(fn, fp)
     }
 
     if (hook.hasOwnProperty("shellExec")) {
       var se = hook.shellExec
       if (se.exec) {
-        var fs = (typeof se.exec == "function") ? se.exec(hook.payload, key) : se.exec
+        var fs = (typeof se.exec == "function") ? se.exec(param, key) : se.exec
         var options = (se.options) ? se.options : null
-        var fo = (typeof options == "function") ? options(hook.payload, key) : Object.assign({}, options)
+        var fo = (typeof options == "function") ? options(param, key) : options
         this.sendSocketNotification("SHELLEXEC", {command:fs, options:fo})
       }
     }
@@ -704,12 +620,12 @@ class AssistantHelper {
       var me = hook.moduleExec
       var m = me.module
       if (typeof me.module == 'function') {
-        m = me.module(hook.payload)
+        m = me.module(param)
       }
       if (Array.isArray(m)) {
         MM.getModules().enumerate((module)=>{
           if (m.length == 0 || (m.indexOf(module.name) >=0)) {
-            var payload = Object.assign({}, hook.payload)
+            var payload = Object.assign({}, param)
             me.exec(module, payload, key)
           }
         })
@@ -722,7 +638,7 @@ class AssistantHelper {
       for(var i in foundHook) {
         var res = foundHook[i]
         var hook = this.config.transcriptionHook[res.key]
-        this.doCommand(hook, res.key)
+        this.doCommand(hook, res.match, res.key)
       }
     }
   }
@@ -731,7 +647,7 @@ class AssistantHelper {
     if (foundAction) {
       if (this.config.action.hasOwnProperty(foundAction.command)) {
         var action = this.config.action[foundAction.command]
-        this.doCommand(action, foundAction.params)
+        this.doCommand(action, foundAction.params, foundAction.command)
       }
     }
   }
@@ -741,6 +657,11 @@ class AssistantHelper {
     this.foundAction(payload.foundAction)
     this.foundHook(payload.foundHook)
 
+	if (payload.foundOpenSpotify) {
+		this.sendNotification("PLAY_SPOTIFY", {
+			url: payload.foundOpenSpotify
+		})
+    };
 
     if (payload.foundVideo || payload.foundVideoList) {
       if (this.config.youtubeAutoplay) {
@@ -760,6 +681,16 @@ class AssistantHelper {
         if (!this.config.pauseOnYoutube) {
           this.deactivate()
         }
+      }
+	  if (this.config.spotifyAutoplay) {
+        var after = ()=>{}
+        if (this.config.pauseOnYoutube) {
+          after = ()=>{
+            this.clearResponse()
+            this.deactivate()
+          }
+        }
+
       }
     } else {
       var thenAfter
@@ -805,32 +736,58 @@ class AssistantHelper {
     }
     holder.appendChild(close)
     this.youtubePlaying = true
-    ytp = new YT.Player(yt.id, {
-      playerVars: {
-        "controls": 0,
-        "loop": 1,
-        "rel": 0,
-      },
-      events: {
-        "onReady": (event)=>{
-          console.log("Youtube player: on ready.")
-          if (type == "video") {
-            event.target.loadVideoById(id)
-          } else {
-            event.target.loadPlaylist(id)
-          }
-          event.target.playVideo()
-        },
-        "onStateChange": (event)=>{
-          if (event.data == 0) {
-            console.log("Youtube player: playing ends")
+    var quality = this.config.youtubePlayQuality
+    var playerVars = this.config.youtubePlayerVars
+    var index = 0
+    var pl = []
+    var onReady = (event) => {
+      console.log("Youtube player: on ready.")
+      if (type == "video") {
+        event.target.loadVideoById(id)
+      } else {
+        event.target.loadPlaylist({
+          listType: "playlist",
+          list:id
+        })
+      }
+      event.target.playVideo()
+      event.target.setPlaybackQuality(quality)
+    }
+
+    var currentIndex = 0
+    var onStateChange = (event)=>{
+      var playlist = event.target.getPlaylist()
+      if (event.data == YT.PlayerState.PLAYING) {
+        currentIndex = event.target.getPlaylistIndex();
+      }
+      if (event.data == YT.PlayerState.ENDED) {
+        if (Array.isArray(playlist)) {
+          if (currentIndex == (playlist.length - 1)) {
+            console.log("Youtube player: All list ends")
             setTimeout(()=>{
               onClose(holder, cb)
             }, 100)
           } else {
-            console.log("youtube status:", event.data)
+            console.log("Youtube player: Next Video")
+            event.target.nextVideo()
           }
-        },
+        } else {
+          console.log("Youtube player: Video ends")
+          setTimeout(()=>{
+            onClose(holder, cb)
+          }, 100)
+        }
+
+      } else {
+        console.log("youtube status:", event.data)
+      }
+    }
+
+    ytp = new YT.Player(yt.id, {
+      playerVars: playerVars,
+      events: {
+        "onReady": onReady,
+        "onStateChange": onStateChange,
         "onError": (event)=> {
           console.log("youtube error:", id, event)
         }

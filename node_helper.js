@@ -9,6 +9,8 @@ const record = require("node-record-lpcm16")
 const GoogleAssistant = require("google-assistant")
 const exec = require("child_process").exec
 const fs = require("fs")
+const serialize = require("./vendor/serialize.js")
+
 
 var NodeHelper = require("node_helper")
 
@@ -68,13 +70,28 @@ module.exports = NodeHelper.create({
     })
   },
 
-  initializeAfterLoading: function (config) {
+  loadRecipes: function(cb) {
+    var recipes = this.config.recipes
+    for (var i = 0; i < recipes.length; i++) {
+      var p = require("./recipes/" + recipes[i]).recipe
+      if (p.transcriptionHook) this.config.transcriptionHook = Object.assign({}, this.config.transcriptionHook, p.transcriptionHook)
+      if (p.action) this.config.action = Object.assign({}, this.config.action, p.action)
+      if (p.command) this.config.command = Object.assign({}, this.config.command, p.command)
+      console.log("[AMK2] Recipe is loaded:", recipes[i])
+      this.sendSocketNotification("LOAD_RECIPE", serialize.serialize(p))
+    }
+    cb()
+  },
+
+
+  initializeAfterLoading: function (config, cb) {
     this.config = config
     if (!this.config.verbose) {
       console.log = function() {}
     }
     this.gactionCLI()
     this.clearTmp()
+    this.loadRecipes(cb)
   },
 
   gactionCLI: function() {
@@ -91,15 +108,17 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
     case "INIT":
-      this.initializeAfterLoading(payload)
-      this.sendSocketNotification("INITIALIZED")
+      this.initializeAfterLoading(payload, ()=>{
+        this.sendSocketNotification("INITIALIZED", this.config)
+      })
+
       break
     case "START":
       this.prepareActivate(payload)
       break
     case "SHELLEXEC":
       var command = payload.command
-      command += (payload.option) ? (" " + payload.option) : ""
+      command += (payload.options) ? (" " + payload.options) : ""
       exec (command, (e,so,se)=> {
         console.log("[AMK2] ShellExec command:", command)
         if (e) console.log(e)
@@ -177,6 +196,7 @@ module.exports = NodeHelper.create({
       let foundAction = null
       let foundVideo = null
       let foundVideoList = null
+      let foundOpenSpotify = null
       let foundTextResponse = ""
       let finalTranscription = ""
       let audioError = null
@@ -235,6 +255,7 @@ module.exports = NodeHelper.create({
       })
       // the device needs to complete an action
       .on("device-action", (action) => {
+        console.log(action, payload)
         console.log("[AMK2] Device Action:", action)
         if (typeof action["inputs"] !== "undefined") {
           var intent = action.inputs[0].payload.commands[0].execution[0]
@@ -274,18 +295,26 @@ module.exports = NodeHelper.create({
 
         var re = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
         var youtubeVideo = re.exec(str)
-        if (youtubeVideo) {
+        if (youtubeVideo && this.config.youtubeAutoplay) {
           console.log("[AMK2] video found:", youtubeVideo[1])
           foundVideo = youtubeVideo[1]
         }
 
         var re = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
         var youtubeList = re.exec(str)
-        if (youtubeList) {
+        if (youtubeList && this.config.youtubeAutoplay) {
           console.log("[AMK2] video list found:", youtubeList[1])
           foundVideoList = youtubeList[1]
         }
-      })
+
+        var re = new RegExp("https:\/\/open\.spotify\.com\/([a-zA-Z0-9?\/]+)", "gm")
+        var openSpotify = re.exec(str)
+        if (openSpotify) {
+          console.log("[AMK2] openSpotify found:", openSpotify[0])
+          foundOpenSpotify = openSpotify[0]
+        }
+      }
+         )
 
       // once the conversation is ended, see if we need to follow up
       .on("ended", (error, continueConversation) => {
@@ -294,6 +323,7 @@ module.exports = NodeHelper.create({
           foundHook = []
           foundVideo = null
           foundVideoList = null
+          foundOpenSpotify = null
         } else {
           var tr = (textQuery) ? textQuery : finalTranscription
           foundHook = this.findHook(transcriptionHook, tr)
@@ -316,6 +346,7 @@ module.exports = NodeHelper.create({
             "foundAction": foundAction,
             "foundVideo": foundVideo,
             "foundVideoList": foundVideoList,
+	          "foundOpenSpotify": foundOpenSpotify,
             "foundTextResponse" : foundTextResponse,
             "finalTranscription" : finalTranscription,
             "spoken": spoken,
@@ -332,9 +363,11 @@ module.exports = NodeHelper.create({
             this.sendSocketNotification("CONVERSATION_END", conversationResult)
           } else {
             if (conversationResult.audioSize <= 0) {
-              conversationResult.audioError = "NO RESPONSE AUDIO IS RETURNED."
-              conversationResult.error = conversationResult.audioError
-              console.log("[AMK2]", conversationResult.audioError)
+              if (!this.config.ignoreNoVoiceError) {
+                conversationResult.audioError = "NO RESPONSE AUDIO IS RETURNED."
+                conversationResult.error = conversationResult.audioError
+                console.log("[AMK2]", conversationResult.audioError)
+              }
               this.sendSocketNotification("CONVERSATION_END", conversationResult)
             } else {
               this.sendSocketNotification("RESPONSE_START", conversationResult)
