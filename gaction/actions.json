@@ -62,6 +62,54 @@
             }
         },
         {
+          "name": "com.example.actions.Number",
+          "availability": {
+            "deviceClasses": [
+                {
+                    "assistantSdkDevice": {}
+                }
+            ]
+          },
+          "intent": {
+            "name": "com.example.intents.Number",
+              "parameters": [
+                  {
+                      "name": "number",
+                      "type": "SchemaOrg_Number"
+                  }
+              ],
+              "trigger": {
+                "queryPatterns": [
+                  "Number $SchemaOrg_Number:number ",
+                  "number $SchemaOrg_Number:number ",
+                  "count $SchemaOrg_Number:number "
+
+                ]
+              }
+          },
+          "fulfillment": {
+              "staticFulfillment": {
+                  "templatedResponse": {
+                      "items": [
+                          {
+                              "simpleResponse": {
+                                  "textToSpeech": "number is recognized"
+                              }
+                          },
+                          {
+                              "deviceExecution": {
+                                  "command": "com.example.commands.Number",
+                                  "params": {
+                                      "number": "$number"
+                                  }
+                              }
+                          }
+                      ]
+                  }
+              }
+          }
+        },
+        {
             "name": "com.example.actions.PAGE",
             "availability": {
                 "deviceClasses": [
