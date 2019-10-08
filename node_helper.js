@@ -243,6 +243,7 @@ module.exports = NodeHelper.create({
         }
       })
 
+
       // what the assistant said back. But currently, GAS doesn"t return text response with screenOut at same time (maybe.)
       .on("response", (text) => {
         console.log("[AMK2] Assistant Text Response:", text)
@@ -255,8 +256,9 @@ module.exports = NodeHelper.create({
       })
       // the device needs to complete an action
       .on("device-action", (action) => {
-        console.log(action, payload)
-        console.log("[AMK2] Device Action:", action)
+        // console.log(action, payload)
+        console.log("[AMK2] Device Action: action", action)
+        console.log("[AMK2] Device Action: payload", payload)
         if (typeof action["inputs"] !== "undefined") {
           var intent = action.inputs[0].payload.commands[0].execution[0]
           console.log("[AMK2] Action execution", intent)
@@ -318,6 +320,11 @@ module.exports = NodeHelper.create({
 
       // once the conversation is ended, see if we need to follow up
       .on("ended", (error, continueConversation) => {
+
+        console.log("[AMK2] Assistant ended:");
+
+        
+
         if (continueConversation) {
           this.continueConversation = continueConversation
           foundHook = []
@@ -390,7 +397,12 @@ module.exports = NodeHelper.create({
         this.sendSocketNotification("CONVERSATION_ERROR", error)
       })
       if (!textQuery) {
-        var mic = record.start(this.config.record)
+
+        console.log('this.config.record', this.config.record);
+        
+
+        var mic = record.start( {threshold: 0} )
+
         this.sendSocketNotification("MIC_ON")
         mic.on("data", (data) => {
           try {

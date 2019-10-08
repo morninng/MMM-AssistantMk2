@@ -1,0 +1,19 @@
+
+Register and get auth.
+./gactions update --action_package actions.json --project nec-investigation
+Activate & Refresh
+./gactions test --action_package actions.json --project nec-investigation
+
+
+
+https://github.com/actions-on-google/actionssdk-conversation-components-nodejs
+
+
+https://github.com/actions-on-google/actions-on-google-nodejs
+
+
+
+https://developers.google.com/actions/assistant/surface-capabilities
+
+
+https://developers.google.com/actions/sdk/create-a-project
