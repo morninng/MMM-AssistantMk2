@@ -92,11 +92,6 @@
                 "templatedResponse": {
                     "items": [
                         {
-                            "simpleResponse": {
-                                "textToSpeech": "number is recognized"
-                            }
-                        },
-                        {
                             "deviceExecution": {
                                 "command": "com.example.commands.Number",
                                 "params": {
@@ -163,23 +158,6 @@
                   }
               }
           }
-      },
-      {
-        "description": "Launch intent",
-        "availability": {
-          "deviceClasses": [
-              {
-                  "assistantSdkDevice": {}
-              }
-          ]
-      },
-        "name": "MAIN",
-        "fulfillment": {
-          "conversationName": "mainConversation"
-        },
-        "intent": {
-          "name": "actions.intent.MAIN"
-        }
       }
   ],
   "types": [
@@ -245,12 +223,5 @@
               }
           ]
       }
-  ],
-  "conversations": {
-    "mainConversation": {
-      "name": "mainConversation",
-      "url": "https://us-central1-nec-investigation.cloudfunctions.net/webhook",
-      "fulfillmentApiVersion": 2
-    }
-  }
+  ]
 }

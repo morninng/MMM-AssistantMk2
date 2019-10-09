@@ -377,6 +377,13 @@ module.exports = NodeHelper.create({
               }
               this.sendSocketNotification("CONVERSATION_END", conversationResult)
             } else {
+              if(!foundAction){
+                console.log("!!!!!!no action!!!!!");
+                this.sendSocketNotification("NOACTION_RESPONSE");
+              }else{
+                console.log("!!!!!!action!!!!!!");
+              }
+              console.log("!!!!!!RESPONSE_START!!!!!!");
               this.sendSocketNotification("RESPONSE_START", conversationResult)
               this.playResponse(mp3File, ()=>{
                 console.log("[AMK2] Conversation Completed")
