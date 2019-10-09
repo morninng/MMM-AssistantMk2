@@ -653,7 +653,6 @@ class AssistantHelper {
   }
 
   foundAction(foundAction) {
-    var found = false;
     if (foundAction) {
       if (this.config.action.hasOwnProperty(foundAction.command)) {
         var action = this.config.action[foundAction.command]
