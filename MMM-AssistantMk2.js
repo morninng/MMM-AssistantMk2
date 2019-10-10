@@ -254,21 +254,29 @@ Module.register("MMM-AssistantMk2", {
         this.assistant.speakerStatus(false)
         break
       case "TRANSCRIPTION":
+          console.log("TRANSCRIPTION")
         this.assistant.transcription(payload)
         break
       case "RESPONSE_START":
+          console.log("RESPONSE_START", payload);
         this.assistant.responseStart(payload)
         break
       case "RESPONSE_END":
+        console.log("RESPONSE_END")
         this.sendNotification(this.config.notifications.ASSISTANT_RESPONSE_END)
         break
       case "CONVERSATION_END":
+          console.log("CONVERSATION_END")
         this.assistant.conversationEnd(payload)
         break
       case "CONVERSATION_ERROR":
       case "ASSISTANT_ERROR":
         this.assistant.onError(notification)
         break
+      case "NOACTION_RESPONSE":
+        console.log("!!!!!!!!!! NOACTION_RESPONSE !!!!!!!!!");
+          this.sendNotification("PAGE_CHANGED", 3);
+        break;
     }
   },
 
@@ -634,13 +642,14 @@ class AssistantHelper {
   }
 
   foundHook (foundHook) {
+
     if (foundHook.length > 0) {
       for(var i in foundHook) {
         var res = foundHook[i]
         var hook = this.config.transcriptionHook[res.key]
-        this.doCommand(hook, res.match, res.key)
       }
     }
+
   }
 
   foundAction(foundAction) {
@@ -653,9 +662,11 @@ class AssistantHelper {
   }
 
   conversationEnd(payload) {
+    console.log("conversationEnd");
     this.foundError(payload.error)
-    this.foundAction(payload.foundAction)
-    this.foundHook(payload.foundHook)
+     this.foundAction(payload.foundAction)
+    this.foundHook(payload.foundHook);
+
 
 	if (payload.foundOpenSpotify) {
 		this.sendNotification("PLAY_SPOTIFY", {
