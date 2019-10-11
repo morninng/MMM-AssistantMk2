@@ -62,6 +62,46 @@
           }
       },
       {
+        "name": "com.example.actions.Calendar",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Calendar",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "カレンダー $SchemaOrg_Text:anyText",
+                "カレンダー "
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Calendar",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+      {
         "name": "com.example.actions.Number",
         "availability": {
           "deviceClasses": [
@@ -96,6 +136,51 @@
                                 "command": "com.example.commands.Number",
                                 "params": {
                                     "number": "$number"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+
+      {
+        "name": "com.example.actions.Time",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Time",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "時間 $SchemaOrg_Text:anyText",
+                "時間",
+                "何時 $SchemaOrg_Text:anyText",
+                "何時",
+                "時計 $SchemaOrg_Text:anyText",
+                "時計"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Time",
+                                "params": {
                                 }
                             }
                         }
@@ -223,5 +308,6 @@
               }
           ]
       }
-  ]
+  ],
+  "locale": "ja"
 }
