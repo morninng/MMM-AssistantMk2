@@ -275,7 +275,7 @@ Module.register("MMM-AssistantMk2", {
         break
       case "NOACTION_RESPONSE":
         console.log("!!!!!!!!!! NOACTION_RESPONSE !!!!!!!!!");
-          this.sendNotification("PAGE_CHANGED", 3);
+          this.sendNotification("PAGE_CHANGED", 1);
         break;
     }
   },

@@ -18,6 +18,10 @@
               "name": "com.example.intents.REBOOT",
               "parameters": [
                   {
+                    "name": "anyText",
+                    "type": "SchemaOrg_Text"
+                  },
+                  {
                       "name": "delay",
                       "type": "SchemaOrg_Number"
                   },
@@ -33,7 +37,9 @@
               "trigger": {
                   "queryPatterns": [
                       "reboot after $SchemaOrg_Number:delay $Unit:unit",
-                      "reboot $Now:now"
+                      "reboot $Now:now",
+                      "再起動 $SchemaOrg_Text:anyText",
+                      "再起動"
                   ]
               }
           },
@@ -41,11 +47,6 @@
               "staticFulfillment": {
                   "templatedResponse": {
                       "items": [
-                          {
-                              "simpleResponse": {
-                                  "textToSpeech": "Your Mirror will be rebooted, My lord."
-                              }
-                          },
                           {
                               "deviceExecution": {
                                   "command": "com.example.commands.REBOOT",
@@ -60,6 +61,126 @@
                   }
               }
           }
+      },
+      {
+        "name": "com.example.actions.Home",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Home",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "ホーム $SchemaOrg_Text:anyText",
+                "ホーム"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Home",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+      {
+        "name": "com.example.actions.Calendar",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Calendar",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "カレンダー $SchemaOrg_Text:anyText",
+                "カレンダー "
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Calendar",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+      {
+        "name": "com.example.actions.Workout",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Workout",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "ワークアウト $SchemaOrg_Text:anyText",
+                "ワークアウト"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Workout",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
       },
       {
         "name": "com.example.actions.Number",
@@ -96,6 +217,139 @@
                                 "command": "com.example.commands.Number",
                                 "params": {
                                     "number": "$number"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+
+      {
+        "name": "com.example.actions.Bye",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Bye",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "バーイ $SchemaOrg_Text:anyText",
+                "バーイ",
+                "バイバイ $SchemaOrg_Text:anyText",
+                "バイバイ",
+                "さようなら $SchemaOrg_Text:anyText",
+                "さようなら",
+                "またね $SchemaOrg_Text:anyText",
+                "またね"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Bye",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+
+      {
+        "name": "com.example.actions.Time",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Time",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "時間 $SchemaOrg_Text:anyText",
+                "時間",
+                "何時 $SchemaOrg_Text:anyText",
+                "何時",
+                "時計 $SchemaOrg_Text:anyText",
+                "時計"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Time",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+      },
+
+      {
+        "name": "com.example.actions.Weather",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Weather",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "天気 $SchemaOrg_Text:anyText",
+                "天気"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Weather",
+                                "params": {
                                 }
                             }
                         }
@@ -158,6 +412,52 @@
                   }
               }
           }
+      },
+      {
+        "name": "com.example.actions.Shutdown",
+        "availability": {
+          "deviceClasses": [
+              {
+                  "assistantSdkDevice": {}
+              }
+          ]
+        },
+        "intent": {
+          "name": "com.example.intents.Shutdown",
+            "parameters": [
+              {
+                "name": "anyText",
+                "type": "SchemaOrg_Text"
+              }
+            ],
+            "trigger": {
+              "queryPatterns": [
+                "シャットダウン $SchemaOrg_Text:anyText",
+                "シャットダウン",
+                "終了 $SchemaOrg_Text:anyText",
+                "終了",
+                "終わり $SchemaOrg_Text:anyText",
+                "終わり",
+                "停止 $SchemaOrg_Text:anyText",
+                "停止"
+              ]
+            }
+        },
+        "fulfillment": {
+            "staticFulfillment": {
+                "templatedResponse": {
+                    "items": [
+                        {
+                            "deviceExecution": {
+                                "command": "com.example.commands.Shutdown",
+                                "params": {
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
       }
   ],
   "types": [
@@ -223,5 +523,6 @@
               }
           ]
       }
-  ]
+  ],
+  "locale": "ja"
 }

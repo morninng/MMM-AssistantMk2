@@ -5,7 +5,6 @@ Activate & Refresh
 ./gactions test --action_package actions.json --project nec-investigation
 
 
-
 https://github.com/actions-on-google/actionssdk-conversation-components-nodejs
 
 
@@ -17,3 +16,7 @@ https://developers.google.com/actions/assistant/surface-capabilities
 
 
 https://developers.google.com/actions/sdk/create-a-project
+
+
+https://developers.google.com/assistant/conversational/reference/rest/Shared.Types/QueryPatterns
+
