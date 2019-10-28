@@ -408,7 +408,13 @@ module.exports = NodeHelper.create({
         console.log('this.config.record', this.config.record);
         
 
-        var mic = record.start( {threshold: 0, device: this.config.record.device ?  this.config.record.device : null} )
+        var record_param = {
+          recordProgram: this.config.record.recordProgram ?  this.config.record.recordProgram : "arecord",
+          threshold: this.config.record.threshold ?  this.config.record.threshold : 0,
+          device: this.config.record.device ?  this.config.record.device : null};
+        console.log('record_param', record_param);
+
+        var mic = record.start( record_param )
 
         this.sendSocketNotification("MIC_ON")
         mic.on("data", (data) => {
